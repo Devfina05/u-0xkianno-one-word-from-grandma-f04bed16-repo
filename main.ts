@@ -32,6 +32,15 @@ const OUTPUT_PATH =
   process.env.OUTPUT_PATH ?? join("/output", "entry.txt");
 
 function main(): void {
+  // Self-check against the published gate before writing: the sealed
+  // scorer only accepts UTF-8 text of 1 to 30 characters, not only
+  // whitespace. Fail loudly here instead of shipping an invalid entry.
+  if (WORD.length < 1 || WORD.length > 30) {
+    throw new Error(`Word must be 1-30 characters, got ${WORD.length}`);
+  }
+  if (/\s/.test(WORD)) {
+    throw new Error("Entry must be exactly one word, no whitespace");
+  }
   mkdirSync(dirname(OUTPUT_PATH), { recursive: true });
   writeFileSync(OUTPUT_PATH, WORD, "utf8");
   console.log(`Wrote one word to ${OUTPUT_PATH}: ${WORD}`);
